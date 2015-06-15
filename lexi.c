@@ -40,7 +40,7 @@ bool lexi_natural_automato(char *entrada)
 {
   unsigned int indice = 0;
   unsigned int state = 0;
-  while (1)
+  while (true)
   {
     switch (state)
     {
@@ -65,7 +65,64 @@ bool lexi_natural_automato(char *entrada)
     }
     indice++;
   }
+}
+
+// Identificadores
+//
+// EBNF:
+// identificador = letra {letra | dígito | "_"}.
+//
+// Gramática:
+// G = (N, T, R, S)
+// N = {S, A}
+// T = {letra, dígito, _}
+// R:
+//   1) S -> letra A
+//   2) A -> letra A | dígito A | _ A | letra | dígito | _
+bool lexi_identificador_ebnf(char *entrada)
+{
+  unsigned int indice = 0;
+  // Verifica se o primeiro caractere é uma letra (obrigatória)
+  if (!isalpha(entrada[indice]))
+    return false;
+  indice++;
+  // Verifica os demais caracteres que houverem, até encontrar um caractere que não for letra, dígito ou sublinhado
+  while (isalpha(entrada[indice]) || isdigit(entrada[indice]) || entrada[indice] == '_')
+    indice++;
+  if (entrada[indice] != '\0')
+    return false;
   return true;
+}
+
+bool lexi_identificador_automato(char *entrada)
+{
+  unsigned int indice = 0;
+  unsigned int state = 0;
+  while (true)
+  {
+    switch (state)
+    {
+      case 0:
+        // Transição do estado 0 para o estado 1, lendo letra
+        if (isalpha(entrada[indice]))
+          state = 1;
+        else
+          return false; // Travamento ou estado final inválido!
+        break;
+      case 1:
+        // Laço no estado 1, lendo letra, dígito ou sublinhado
+        if (isalpha(entrada[indice]) || isdigit(entrada[indice]) || entrada[indice] == '_')
+          state = 1;
+        else
+          // Fim da análise
+          if (entrada[indice] == '\0')
+            return true;
+          else
+            return false; // Travamento!
+         break;
+    }
+    indice++;
+  }
 }
 
 int main(int argc, char **argv)
